@@ -89,7 +89,7 @@ class SSE extends EventEmitter {
     };
 
     const clientDataListener = data => {
-      if (data.channel && data.client === client) {
+      if (data.client && data.client === client) {
         if (data.id) {
           res.write(`id: ${data.id}\n`);
         } else {
