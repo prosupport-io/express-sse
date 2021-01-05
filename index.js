@@ -39,6 +39,8 @@ class SSE extends EventEmitter {
    */
   init(req, res) {
     let id = 0;
+    let client = req.query.client;
+    let channel = req.query.channel;
     req.socket.setTimeout(0);
     req.socket.setNoDelay(true);
     req.socket.setKeepAlive(true);
@@ -70,6 +72,38 @@ class SSE extends EventEmitter {
       res.flush();
     };
 
+    const channelDataListener = data => {
+      if (data.channel && data.channel === channel) {
+        if (data.id) {
+          res.write(`id: ${data.id}\n`);
+        } else {
+          res.write(`id: ${id}\n`);
+          id += 1;
+        }
+        if (data.event) {
+          res.write(`event: ${data.event}\n`);
+        }
+        res.write(`data: ${JSON.stringify(data.data)}\n\n`);
+        res.flush();
+      }
+    };
+
+    const clientDataListener = data => {
+      if (data.channel && data.client === client) {
+        if (data.id) {
+          res.write(`id: ${data.id}\n`);
+        } else {
+          res.write(`id: ${id}\n`);
+          id += 1;
+        }
+        if (data.event) {
+          res.write(`event: ${data.event}\n`);
+        }
+        res.write(`data: ${JSON.stringify(data.data)}\n\n`);
+        res.flush();
+      }
+    };
+
     const serializeListener = data => {
       const serializeSend = data.reduce((all, msg) => {
         all += `id: ${id}\ndata: ${JSON.stringify(msg)}\n\n`;
@@ -80,7 +114,8 @@ class SSE extends EventEmitter {
     };
 
     this.on('data', dataListener);
-
+    this.on('channelData', channelDataListener);
+    this.on('clientData', clientDataListener);
     this.on('serialize', serializeListener);
 
     if (this.initial) {
@@ -122,6 +157,28 @@ class SSE extends EventEmitter {
    */
   send(data, event, id) {
     this.emit('data', { data, event, id });
+  }
+
+  /**
+   * Send data only to specific channel
+   * @param [string] channel Channel id to send data (channel initialized as get param)
+   * @param {(object|string)} data Data to send into the stream
+   * @param [string] event Event name
+   * @param [(string|number)] id Custom event ID
+   */
+  sendToChannel(channel, data, event, id) {
+    this.emit('channelData', { channel, data, event, id });
+  }
+
+  /**
+   * Send data only to specific client
+   * @param [string] channel Client id to send data (client initialized as get param)
+   * @param {(object|string)} data Data to send into the stream
+   * @param [string] event Event name
+   * @param [(string|number)] id Custom event ID
+   */
+  sendToClient(client, data, event, id) {
+    this.emit('clientData', { client, data, event, id });
   }
 
   /**
