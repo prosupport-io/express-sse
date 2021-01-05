@@ -1,5 +1,5 @@
 {
-  "name": "express-sse",
+  "name": "@gazdagandras/express-sse",
   "version": "0.5.3",
   "description": "An Express middleware for Server-Sent Events (EventSource)",
   "main": "index.js",
