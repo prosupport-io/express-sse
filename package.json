@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/dpskvn/express-sse.git"
+    "url": "git://github.com/gazdagandras/express-sse.git"
   },
   "keywords": [
     "express",
