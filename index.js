@@ -69,38 +69,18 @@ class SSE extends EventEmitter {
         res.write(`event: ${data.event}\n`);
       }
       res.write(`data: ${JSON.stringify(data.data)}\n\n`);
-      res.flush();
+      res.flushHeaders();
     };
 
     const channelDataListener = data => {
       if (data.channel && data.channel === channel) {
-        if (data.id) {
-          res.write(`id: ${data.id}\n`);
-        } else {
-          res.write(`id: ${id}\n`);
-          id += 1;
-        }
-        if (data.event) {
-          res.write(`event: ${data.event}\n`);
-        }
-        res.write(`data: ${JSON.stringify(data.data)}\n\n`);
-        res.flush();
+        dataListener(data);
       }
     };
 
     const clientDataListener = data => {
       if (data.client && data.client === client) {
-        if (data.id) {
-          res.write(`id: ${data.id}\n`);
-        } else {
-          res.write(`id: ${id}\n`);
-          id += 1;
-        }
-        if (data.event) {
-          res.write(`event: ${data.event}\n`);
-        }
-        res.write(`data: ${JSON.stringify(data.data)}\n\n`);
-        res.flush();
+        dataListener(data);
       }
     };
 
