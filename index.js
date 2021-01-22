@@ -39,6 +39,7 @@ class SSE extends EventEmitter {
    */
   init(req, res) {
     let id = 0;
+    let browser = req.query.browser;
     let client = req.query.client;
     let channel = req.query.channel;
     req.socket.setTimeout(0);
@@ -56,7 +57,7 @@ class SSE extends EventEmitter {
     }
 
     // Increase number of event listeners on init
-    this.setMaxListeners(this.getMaxListeners() + 2);
+    this.setMaxListeners(this.getMaxListeners() + 5);
 
     const dataListener = data => {
       if (data.id) {
@@ -84,6 +85,12 @@ class SSE extends EventEmitter {
       }
     };
 
+    const browserDataListener = data => {
+      if (data.browser && data.browser === browser) {
+        dataListener(data);
+      }
+    };
+
     const serializeListener = data => {
       const serializeSend = data.reduce((all, msg) => {
         all += `id: ${id}\ndata: ${JSON.stringify(msg)}\n\n`;
@@ -96,6 +103,7 @@ class SSE extends EventEmitter {
     this.on('data', dataListener);
     this.on('channelData', channelDataListener);
     this.on('clientData', clientDataListener);
+    this.on('browserData', browserDataListener);
     this.on('serialize', serializeListener);
 
     if (this.initial) {
@@ -109,8 +117,14 @@ class SSE extends EventEmitter {
     // Remove listeners and reduce the number of max listeners on client disconnect
     req.on('close', () => {
       this.removeListener('data', dataListener);
+      this.removeListener('channelData', channelDataListener);
+      this.removeListener('clientData', clientDataListener);
+      this.removeListener('browserData', browserDataListener);
       this.removeListener('serialize', serializeListener);
-      this.setMaxListeners(this.getMaxListeners() - 2);
+      this.setMaxListeners(this.getMaxListeners() - 5);
+      if (this.options.closeCallback) {
+        this.options.closeCallback({ browser, client, channel });
+      }
     });
   }
 
@@ -159,6 +173,17 @@ class SSE extends EventEmitter {
    */
   sendToClient(client, data, event, id) {
     this.emit('clientData', { client, data, event, id });
+  }
+
+  /**
+   * Send data only to specific browser session
+   * @param [string] channel Browser id to send data (browser initialized as get param)
+   * @param {(object|string)} data Data to send into the stream
+   * @param [string] event Event name
+   * @param [(string|number)] id Custom event ID
+   */
+  sendToClient(browser, data, event, id) {
+    this.emit('browserData', { browser, data, event, id });
   }
 
   /**
