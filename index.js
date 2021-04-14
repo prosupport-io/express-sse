@@ -182,7 +182,7 @@ class SSE extends EventEmitter {
    * @param [string] event Event name
    * @param [(string|number)] id Custom event ID
    */
-  sendToClient(browser, data, event, id) {
+  sendToBrowser(browser, data, event, id) {
     this.emit('browserData', { browser, data, event, id });
   }
 

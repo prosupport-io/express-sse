@@ -1,6 +1,6 @@
 {
   "name": "@gazdagandras/express-sse",
-  "version": "0.5.6",
+  "version": "0.5.7",
   "description": "An Express middleware for Server-Sent Events (EventSource)",
   "main": "index.js",
   "scripts": {
