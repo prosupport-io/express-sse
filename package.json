@@ -1,5 +1,5 @@
 {
-  "name": "@gazdagandras/express-sse",
+  "name": "@prosupport-io/express-sse",
   "version": "0.5.7",
   "description": "An Express middleware for Server-Sent Events (EventSource)",
   "main": "index.js",
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/gazdagandras/express-sse.git"
+    "url": "git://github.com/prosupport-io/express-sse.git"
   },
   "keywords": [
     "express",
